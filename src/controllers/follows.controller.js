@@ -90,7 +90,27 @@ const unfollowUser = async(req, res) => {
     res.json(ApiResponse.ok("Unfollowed the user"))
 }
 
+const getFollowStatus = async(req, res) => {
+    const currentUser = req.user.id
+    const targetUser = req.params.userId
+
+    if(!isUUID(targetUser)){
+        throw ApiError.badRequest("Invalid id")
+    }
+
+    const [followRecord] = await db
+    .select()
+    .from(followsTable)
+    .where(and(
+        eq(followsTable.followerId, currentUser),
+        eq(followsTable.followingId, targetUser)
+    ))
+
+    res.json(ApiResponse.ok("Fetched", {isFollowing: !!followRecord}))
+}
+
 export{
     followUser,
-    unfollowUser
+    unfollowUser,
+    getFollowStatus
 }
