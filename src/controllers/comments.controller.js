@@ -98,7 +98,8 @@ const getComments = async (req, res) => {
     const comments = await db.select({
         id: commentsTable.id,
         message: commentsTable.message,
-        username: usersTable.username
+        username: usersTable.username,
+        userId: usersTable.id
     })
         .from(commentsTable)
         .where(eq(commentsTable.postId, postId))
