@@ -231,6 +231,7 @@ const getPostById = async (req, res) => {
         id: postsTable.id,
         url: postsTable.url,
         caption: postsTable.caption,
+        isPrivate: postsTable.isPrivate,
 
         user: {
             userId: usersTable.id,
@@ -262,6 +263,7 @@ const getPostById = async (req, res) => {
             postsTable.id,
             postsTable.url,
             postsTable.caption,
+            postsTable.isPrivate,
             usersTable.id,
             usersTable.username
         );
