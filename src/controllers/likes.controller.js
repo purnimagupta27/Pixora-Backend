@@ -25,8 +25,6 @@ const createLike = async (req, res) => {
         throw ApiError.notFound("Post not found")
     }
 
-    // Atomic — relies on the unique(userId, postId) index instead of a
-    // separate select-then-insert, so two fast taps can't race each other.
     const inserted = await db
         .insert(likesTable)
         .values({ userId: req.user.id, postId })

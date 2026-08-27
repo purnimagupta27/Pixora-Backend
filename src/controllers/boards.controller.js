@@ -165,7 +165,10 @@ const removePostFromBoard = async (req, res) => {
 
 const getMyBoards = async (req, res) => {
     const boards = await db
-        .select()
+        .select({
+            id: boardsTable.id,
+            name: boardsTable.name
+        })
         .from(boardsTable)
         .where(eq(boardsTable.userId, req.user.id))
 
