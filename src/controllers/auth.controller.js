@@ -9,7 +9,6 @@ import { generateToken, verifyToken } from '../utils/token.js'
 import { postsTable } from '../models/posts.model.js'
 import cookieParser from 'cookie-parser'
 import { followsTable } from '../models/follows.model.js'
-import { count } from 'node:console'
 
 const userSignup = async (req, res) => {
     const validatedData = await signupValidateSchema.safeParseAsync(req.body)

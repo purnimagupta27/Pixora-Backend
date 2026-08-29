@@ -9,6 +9,7 @@ import { usersTable } from "../models/users.model.js"
 import { validate as isUUID } from 'uuid'
 import { likesTable } from "../models/likes.model.js"
 import { commentsTable } from "../models/comments.model.js"
+import { boardsTable } from "../models/boards.model.js"
 
 
 const createPost = async (req, res) => {
@@ -267,10 +268,6 @@ const getPostById = async (req, res) => {
             usersTable.id,
             usersTable.username
         );
-
-    if (!post) {
-        throw ApiError.notFound("Post not found")
-    }
 
     res.json(ApiResponse.ok("Post fetched", post))
 

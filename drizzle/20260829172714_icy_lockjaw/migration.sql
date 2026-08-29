@@ -1,0 +1,1 @@
+ALTER TABLE "BoardPost" RENAME TO "boardPost";

@@ -1,4 +1,5 @@
 import db from "../index.js"
+import { boardPostTable } from "../models/boardPost.model.js"
 import { boardsTable } from "../models/boards.model.js"
 import { postsTable } from "../models/posts.model.js"
 import ApiError from "../utils/api-error.js"
@@ -95,24 +96,18 @@ const addPostToBoard = async (req, res) => {
         .from(postsTable)
         .where(and(
             eq(postsTable.id, postId),
-            eq(postsTable.userId, req.user.id)
         ))
 
     if (!post) {
         throw ApiError.notFound("Post not found")
     }
 
-    if (post.boardId) {
-        throw ApiError.conflict("Post is already added to a board")
-    }
-
-    const addedPost = await db
-        .update(postsTable)
-        .set({ boardId })
-        .where(and(
-            eq(postsTable.id, postId),
-            eq(postsTable.userId, req.user.id)
-        )).returning()
+    const [addedPost] = await db
+    .insert(boardPostTable)
+    .values({
+        boardId,
+        postId
+    }).returning()
 
     res.json(ApiResponse.created("Post added", addedPost))
 }
@@ -244,6 +239,20 @@ const deleteBoard = async(req, res) => {
         )).returning()
 
     res.json(ApiResponse.ok("Board deleted"))
+}
+
+const getBoardStatus = async(req, res) => {
+    const {postId} = req.params
+    
+    const [boardStatus] = await db
+    .select()
+    .from(postsTable)
+    .where(and(
+        eq(postsTable.id, postId),
+        eq(postsTable.boardId, !null)
+    ))
+
+    res.json(ApiResponse.ok("Fetched!", {isBookmarked: !!boardStatus}))
 }
 
 export {
