@@ -196,20 +196,28 @@ const getPostsFromBoard = async (req, res) => {
         throw ApiError.notFound("Board not found")
     }
 
-    const posts = await db
-        .select({
-            postId: postsTable.id,
-            url: postsTable.url
-        })
-        .from(postsTable)
-        .where(eq(postsTable.boardId, boardId))
-
-    const data = {
-        boardName: board.name,
-        posts
+    const result = await db
+    .select({
+        boardPost: boardPostTable,
+        board: boardsTable,
+        posts: postsTable
+    })
+    .from(boardPostTable)
+    .where(eq(boardPostTable.boardId, boardId))
+    .innerJoin(boardsTable, 
+        eq(boardPostTable.boardId, boardsTable.id)
+    )
+    .innerJoin(postsTable,
+        eq(boardPostTable.postId, postsTable.id)
+    )
+    
+    const response = {
+        boardPost: result[0]?.boardPost,
+        board: result[0]?.board,
+        posts: result.map((item) => item.posts)
     }
 
-    res.json(ApiResponse.ok("Posts", data))
+    res.json(ApiResponse.ok("Posts", response))
 }
 
 const deleteBoard = async(req, res) => {
