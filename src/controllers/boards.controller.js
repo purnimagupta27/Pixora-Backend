@@ -219,19 +219,18 @@ const deleteBoard = async(req, res) => {
     res.json(ApiResponse.ok("Board deleted"))
 }
 
-const getBoardStatus = async(req, res) => {
-    const {postId} = req.params
+// const getBoardStatus = async(req, res) => {
+//     const {postId} = req.params
     
-    const [boardStatus] = await db
-    .select()
-    .from(postsTable)
-    .where(and(
-        eq(postsTable.id, postId),
-        eq(postsTable.boardId, !null)
-    ))
+//     const [boardStatus] = await db
+//     .select()
+//     .from(postsTable)
+//     .where(and(
+//         eq(postsTable.id, postId),
+//     ))
 
-    res.json(ApiResponse.ok("Fetched!", {isBookmarked: !!boardStatus}))
-}
+//     res.json(ApiResponse.ok("Fetched!", {isBookmarked: !!boardStatus}))
+// }
 
 export {
     createBoard,

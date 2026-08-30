@@ -269,8 +269,27 @@ const getPostById = async (req, res) => {
             usersTable.username
         );
 
-    res.json(ApiResponse.ok("Post fetched", post))
+    if (!post) {
+        throw ApiError.notFound(`Post with this id ${id} does not exist`)
+    }
 
+    const [userLike] = await db
+        .select({ id: likesTable.id })
+        .from(likesTable)
+        .where(and(
+            eq(likesTable.postId, id),
+            eq(likesTable.userId, req.user.id)
+        ))
+
+    const postResponse = {
+        ...post,
+        likes: {
+            likesCount: post.likes.likesCount,
+            isLiked: Boolean(userLike)
+        }
+    }
+
+    res.json(ApiResponse.ok("Post fetched", postResponse))
 }
 
 //not usable
