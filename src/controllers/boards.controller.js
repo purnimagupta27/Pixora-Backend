@@ -6,7 +6,6 @@ import ApiError from "../utils/api-error.js"
 import ApiResponse from "../utils/api-response.js"
 import { eq, and } from "drizzle-orm"
 import { validate as isUUID } from 'uuid'
-import { url } from "zod"
 
 const createBoard = async (req, res) => {
     const { name } = req.body
@@ -37,41 +36,6 @@ const createBoard = async (req, res) => {
     res.json(ApiResponse.created("Board created", board))
 }
 
-const updateBoardName = async (req, res) => {
-    const { name } = req.body
-    const { boardId } = req.params
-
-    if (!isUUID(boardId)) {
-        throw ApiError.badRequest("Invalid id")
-    }
-
-    const [board] = await db
-        .select()
-        .from(boardsTable)
-        .where(and(
-            eq(boardsTable.id, boardId),
-            eq(boardsTable.userId, req.user.id)
-        ))
-
-    if (!board) {
-        throw ApiError.notFound("Board with id does not found")
-    }
-
-    if (!name || name.trim() === "") {
-        throw ApiError.badRequest("Name is required")
-    }
-
-    const updatedBoard = await db
-        .update(boardsTable)
-        .set({ name })
-        .where(and(
-            eq(boardsTable.id, boardId),
-            eq(boardsTable.userId, req.user.id)
-        )).returning()
-
-    res.json(ApiResponse.ok("Board name updated", updatedBoard))
-}
-
 const addPostToBoard = async (req, res) => {
     const { boardId, postId } = req.params
 
@@ -100,6 +64,18 @@ const addPostToBoard = async (req, res) => {
 
     if (!post) {
         throw ApiError.notFound("Post not found")
+    }
+
+    const alreadyAdded = await db
+    .select()
+    .from(boardPostTable)
+    .where(and(
+        eq(boardPostTable.boardId, boardId),
+        eq(boardPostTable.postId, postId)
+    ))
+
+    if(alreadyAdded){
+        throw ApiError.conflict("This post is already added to this bookmark")
     }
 
     const [addedPost] = await db
@@ -136,26 +112,20 @@ const removePostFromBoard = async (req, res) => {
         .from(postsTable)
         .where(and(
             eq(postsTable.id, postId),
-            eq(postsTable.userId, req.user.id)
         ))
 
     if (!post) {
         throw ApiError.notFound("Post not found")
     }
 
-    if (post.boardId !== boardId) {
-        throw ApiError.notFound("Post is not in board")
-    }
+    const result = await db
+    .delete(boardPostTable)
+    .where(and(
+        eq(boardPostTable.boardId, boardId),
+        eq(boardPostTable.postId, postId)
+    )).returning()
 
-    const removedPost = await db
-        .update(postsTable)
-        .set({ boardId: null })
-        .where(and(
-            eq(postsTable.id, postId),
-            eq(postsTable.userId, req.user.id)
-        )).returning()
-
-    res.json(ApiResponse.ok("Post Removed", removedPost.id))
+    res.json(ApiResponse.ok("Post Removed", result))
 }
 
 const getMyBoards = async (req, res) => {
