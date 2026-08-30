@@ -235,7 +235,6 @@ const getBoardStatus = async(req, res) => {
 
 export {
     createBoard,
-    updateBoardName,
     addPostToBoard,
     removePostFromBoard,
     getMyBoards,
