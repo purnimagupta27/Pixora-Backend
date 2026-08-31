@@ -66,7 +66,7 @@ const addPostToBoard = async (req, res) => {
         throw ApiError.notFound("Post not found")
     }
 
-    const alreadyAdded = await db
+    const [alreadyAdded] = await db
     .select()
     .from(boardPostTable)
     .where(and(
@@ -219,18 +219,36 @@ const deleteBoard = async(req, res) => {
     res.json(ApiResponse.ok("Board deleted"))
 }
 
-// const getBoardStatus = async(req, res) => {
-//     const {postId} = req.params
-    
-//     const [boardStatus] = await db
-//     .select()
-//     .from(postsTable)
-//     .where(and(
-//         eq(postsTable.id, postId),
-//     ))
+const getBoardStatus = async(req, res) => {
+    const {postId} = req.params
 
-//     res.json(ApiResponse.ok("Fetched!", {isBookmarked: !!boardStatus}))
-// }
+    if(!isUUID(postId)){
+        throw ApiError.badRequest("Invalid id")
+    }
+
+    const [post] = await db
+    .select()
+    .from(postsTable)
+    .where(eq(postsTable.id, postId))
+
+    if(!post){
+        throw ApiError.notFound("Post not found")
+    }
+    
+    const [boardStatus] = await db
+    .select()
+    .from(boardPostTable)
+    .innerJoin(boardsTable,
+        eq(boardsTable.id, boardPostTable.boardId)
+    )
+    .where(and(
+        eq(boardPostTable.postId, postId),
+        eq(boardsTable.userId, req.user.id)
+    ))
+    .limit(1)
+
+    res.json(ApiResponse.ok("Fetched!", {isBookmarked: !!boardStatus}))
+}
 
 export {
     createBoard,
@@ -238,5 +256,6 @@ export {
     removePostFromBoard,
     getMyBoards,
     getPostsFromBoard,
-    deleteBoard
+    deleteBoard,
+    getBoardStatus
 }

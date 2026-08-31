@@ -10,5 +10,6 @@ router.delete('/:boardId/remove-post/:postId', authenticate, controller.removePo
 router.get('/my-boards', authenticate, controller.getMyBoards)
 router.get('/:boardId/posts', authenticate, controller.getPostsFromBoard)
 router.delete('/:boardId', authenticate, controller.deleteBoard)
+router.get('/status/:postId', authenticate, controller.getBoardStatus)
 
 export default router
