@@ -67,23 +67,23 @@ const addPostToBoard = async (req, res) => {
     }
 
     const [alreadyAdded] = await db
-    .select()
-    .from(boardPostTable)
-    .where(and(
-        eq(boardPostTable.boardId, boardId),
-        eq(boardPostTable.postId, postId)
-    ))
+        .select()
+        .from(boardPostTable)
+        .where(and(
+            eq(boardPostTable.boardId, boardId),
+            eq(boardPostTable.postId, postId)
+        ))
 
-    if(alreadyAdded){
+    if (alreadyAdded) {
         throw ApiError.conflict("This post is already added to this bookmark")
     }
 
     const [addedPost] = await db
-    .insert(boardPostTable)
-    .values({
-        boardId,
-        postId
-    }).returning()
+        .insert(boardPostTable)
+        .values({
+            boardId,
+            postId
+        }).returning()
 
     res.json(ApiResponse.created("Post added", addedPost))
 }
@@ -119,11 +119,11 @@ const removePostFromBoard = async (req, res) => {
     }
 
     const result = await db
-    .delete(boardPostTable)
-    .where(and(
-        eq(boardPostTable.boardId, boardId),
-        eq(boardPostTable.postId, postId)
-    )).returning()
+        .delete(boardPostTable)
+        .where(and(
+            eq(boardPostTable.boardId, boardId),
+            eq(boardPostTable.postId, postId)
+        )).returning()
 
     res.json(ApiResponse.ok("Post Removed", result))
 }
@@ -167,22 +167,20 @@ const getPostsFromBoard = async (req, res) => {
     }
 
     const result = await db
-    .select({
-        boardPost: boardPostTable,
-        board: boardsTable,
-        posts: postsTable
-    })
-    .from(boardPostTable)
-    .where(eq(boardPostTable.boardId, boardId))
-    .innerJoin(boardsTable, 
-        eq(boardPostTable.boardId, boardsTable.id)
-    )
-    .innerJoin(postsTable,
-        eq(boardPostTable.postId, postsTable.id)
-    )
-    
+        .select({
+            board: boardsTable.id,
+            posts: postsTable
+        })
+        .from(boardPostTable)
+        .where(eq(boardPostTable.boardId, boardId))
+        .innerJoin(boardsTable,
+            eq(boardPostTable.boardId, boardsTable.id)
+        )
+        .innerJoin(postsTable,
+            eq(boardPostTable.postId, postsTable.id)
+        )
+
     const response = {
-        boardPost: result[0]?.boardPost,
         board: result[0]?.board,
         posts: result.map((item) => item.posts)
     }
@@ -190,8 +188,8 @@ const getPostsFromBoard = async (req, res) => {
     res.json(ApiResponse.ok("Posts", response))
 }
 
-const deleteBoard = async(req, res) => {
-    const {boardId} = req.params
+const deleteBoard = async (req, res) => {
+    const { boardId } = req.params
 
     if (!isUUID(boardId)) {
         throw ApiError.badRequest("Invalid id")
@@ -210,8 +208,8 @@ const deleteBoard = async(req, res) => {
     }
 
     await db
-    .delete(boardsTable)
-    .where(and(
+        .delete(boardsTable)
+        .where(and(
             eq(boardsTable.id, boardId),
             eq(boardsTable.userId, req.user.id)
         )).returning()
@@ -219,35 +217,35 @@ const deleteBoard = async(req, res) => {
     res.json(ApiResponse.ok("Board deleted"))
 }
 
-const getBoardStatus = async(req, res) => {
-    const {postId} = req.params
+const getBoardStatus = async (req, res) => {
+    const { postId } = req.params
 
-    if(!isUUID(postId)){
+    if (!isUUID(postId)) {
         throw ApiError.badRequest("Invalid id")
     }
 
     const [post] = await db
-    .select()
-    .from(postsTable)
-    .where(eq(postsTable.id, postId))
+        .select()
+        .from(postsTable)
+        .where(eq(postsTable.id, postId))
 
-    if(!post){
+    if (!post) {
         throw ApiError.notFound("Post not found")
     }
-    
-    const [boardStatus] = await db
-    .select()
-    .from(boardPostTable)
-    .innerJoin(boardsTable,
-        eq(boardsTable.id, boardPostTable.boardId)
-    )
-    .where(and(
-        eq(boardPostTable.postId, postId),
-        eq(boardsTable.userId, req.user.id)
-    ))
-    .limit(1)
 
-    res.json(ApiResponse.ok("Fetched!", {isBookmarked: !!boardStatus}))
+    const [boardStatus] = await db
+        .select()
+        .from(boardPostTable)
+        .innerJoin(boardsTable,
+            eq(boardsTable.id, boardPostTable.boardId)
+        )
+        .where(and(
+            eq(boardPostTable.postId, postId),
+            eq(boardsTable.userId, req.user.id)
+        ))
+        .limit(1)
+
+    res.json(ApiResponse.ok("Fetched!", { isBookmarked: !!boardStatus }))
 }
 
 export {
