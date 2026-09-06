@@ -82,8 +82,8 @@ const userSignin = async (req, res) => {
 
     res.cookie('auth_token', token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'strict'
+        secure: true,
+        sameSite: 'none'
     })
 
     res.json(ApiResponse.ok("User logged-in"))
