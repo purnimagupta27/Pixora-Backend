@@ -5,7 +5,7 @@ import { authenticate } from "../middlewares/auth.middleware.js";
 
 const router = Router()
 
-router.post('/create-post', authenticate,  upload.single("image"), controller.createPost)
+router.post('/create-post', authenticate, upload.single("image"), controller.createPost)
 router.get('/my-posts', authenticate, controller.getMyPosts)
 router.get('/my-post/:id', authenticate, controller.getMyPostById)
 router.patch('/my-post/:id', authenticate, controller.editMyPostById)

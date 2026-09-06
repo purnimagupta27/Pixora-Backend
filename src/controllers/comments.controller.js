@@ -88,7 +88,6 @@ const getComments = async (req, res) => {
         .from(postsTable)
         .where(and(
             eq(postsTable.id, postId),
-            eq(postsTable.isPrivate, false)
         ))
 
     if (!post) {

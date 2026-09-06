@@ -341,6 +341,11 @@ const getUsersPost = async (req, res) => {
     res.json(ApiResponse.ok("User's posts fetched", usersPost))
 }
 
+// const getFollowingsPost = await db
+//     .select()
+//     .from(postsTable)
+//     .where()
+
 export {
     createPost,
     getMyPosts,
