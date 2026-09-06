@@ -10,6 +10,7 @@ import { validate as isUUID } from 'uuid'
 import { likesTable } from "../models/likes.model.js"
 import { commentsTable } from "../models/comments.model.js"
 import { boardsTable } from "../models/boards.model.js"
+import { followsTable } from "../models/follows.model.js"
 
 
 const createPost = async (req, res) => {
@@ -341,10 +342,40 @@ const getUsersPost = async (req, res) => {
     res.json(ApiResponse.ok("User's posts fetched", usersPost))
 }
 
-// const getFollowingsPost = await db
-//     .select()
-//     .from(postsTable)
-//     .where()
+const getFollowingsPosts = async (req, res) => {
+    const limit = Number(req.query.limit) || 5
+    const page = Number(req.query.page) || 1
+    const offset = (page - 1) * limit
+
+    const posts = await db.select({
+        id: postsTable.id,
+        url: postsTable.url,
+        caption: postsTable.caption,
+        user: {
+            userId: usersTable.id,
+            username: usersTable.username
+        }
+    })
+        .from(postsTable)
+        .innerJoin(followsTable,
+            and(
+                eq(followsTable.followerId, req.user.id),
+                eq(followsTable.followingId, postsTable.userId)
+            )
+        )
+        .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
+        .where(eq(postsTable.isPrivate, false))
+        .orderBy(desc(postsTable.createdAt))
+        .limit(limit)
+        .offset(offset)
+
+    res.json(ApiResponse.ok("Following posts fetched", {
+        data: {
+            posts,
+            page
+        }
+    }))
+}
 
 export {
     createPost,
@@ -354,5 +385,6 @@ export {
     deleteMyPostById,
     getAllPosts,
     getPostById,
-    getUsersPost
+    getUsersPost,
+    getFollowingsPosts
 }
