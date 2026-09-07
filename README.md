@@ -50,14 +50,14 @@ Get the backend running locally in **3 easy steps**:
 ### 1️⃣ Clone & Install
 ```bash
 # Navigate to this folder
-cd 02-pinterest
+cd Pixora-Backend
 
 # Install dependencies
 npm install
 ```
 
 ### 2️⃣ Configure Environment
-Create a `.env` file in `02-pinterest/`:
+Create a `.env` file in `Pixora-Backend/`:
 ```env
 PORT=5000
 CORS_ORIGIN=http://localhost:5173
