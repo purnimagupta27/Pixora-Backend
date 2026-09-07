@@ -311,38 +311,6 @@ Understanding how the code is organized makes extending it a breeze:
 
 ---
 
-## 🔒 Security & Session Management
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as User Browser
-    participant Server as Express 5 Server
-    participant DB as Neon PostgreSQL
-
-    User->>Server: POST /api/auth/signin (email, password)
-    Server->>DB: Query user by email
-    DB-->>Server: User record with hashed password
-    Server->>Server: bcrypt.compare(password, hash)
-    Server->>Server: Sign JWT token with SECRET_KEY
-    Server-->>User: Set-Cookie: auth_token=jwt; HttpOnly; SameSite; Secure
-    Note over User,Server: Token is stored securely in cookie (Immune to XSS)
-
-    User->>Server: GET /api/posts/feed (Cookie sent automatically)
-    Server->>Server: auth.middleware verifies JWT
-    Server->>DB: Fetch posts
-    DB-->>Server: Post collection
-    Server-->>User: 200 OK + JSON data
-```
-
-### Why This Setup is Rock-Solid:
-- 🛡️ **HttpOnly Cookie**: JavaScript cannot read the token, making token theft via XSS impossible.
-- ⚡ **Neon Serverless**: Auto-scaling PostgreSQL with zero cold-start headaches.
-- 🧹 **Cascade Cleanups**: If a post is deleted, its likes, comments, and board saves are instantly pruned.
-- 🔒 **Self-Follow Safeguards**: Database-level check constraints prevent users from following themselves.
-
----
-
 ## 🛠️ Handy Database Commands
 
 ```bash
