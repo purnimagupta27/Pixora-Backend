@@ -5,7 +5,7 @@ import { signupValidateSchema, signinValidateSchema } from '../dto/auth.dto.js'
 import db from "../index.js"
 import { usersTable } from '../models/users.model.js'
 import { eq, or, sql, desc } from 'drizzle-orm'
-import { generateToken, verifyToken } from '../utils/token.js'
+import { generateToken } from '../utils/token.js'
 import { postsTable } from '../models/posts.model.js'
 import cookieParser from 'cookie-parser'
 import { followsTable } from '../models/follows.model.js'
@@ -131,8 +131,8 @@ const getMe = async (req, res) => {
 const userLogout = async (req, res) => {
     res.clearCookie("auth_token", {
         httpOnly: true,
-        secure: false,
-        sameSite: "strict",
+        secure: true,
+        sameSite: "none",
     });
     return res.json(ApiResponse.noContent("Logout successful"))
 }

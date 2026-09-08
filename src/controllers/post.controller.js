@@ -4,12 +4,11 @@ import uploadOnCloudinary from "../utils/cloudinary.js"
 import db from "../index.js"
 import { postsTable } from '../models/posts.model.js'
 import ApiResponse from "../utils/api-response.js"
-import { eq, and, desc, count, countDistinct, or } from 'drizzle-orm'
+import { eq, and, desc, countDistinct, or } from 'drizzle-orm'
 import { usersTable } from "../models/users.model.js"
 import { validate as isUUID } from 'uuid'
 import { likesTable } from "../models/likes.model.js"
 import { commentsTable } from "../models/comments.model.js"
-import { boardsTable } from "../models/boards.model.js"
 import { followsTable } from "../models/follows.model.js"
 
 
@@ -215,10 +214,8 @@ const getAllPosts = async (req, res) => {
         .offset(offset)
 
     res.json(ApiResponse.ok("Posts fetched", {
-        data: {
             posts,
             page
-        }
     }))
 }
 
@@ -370,10 +367,8 @@ const getFollowingsPosts = async (req, res) => {
         .offset(offset)
 
     res.json(ApiResponse.ok("Following posts fetched", {
-        data: {
             posts,
             page
-        }
     }))
 }
 
