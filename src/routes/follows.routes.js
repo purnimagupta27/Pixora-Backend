@@ -6,6 +6,8 @@ const router = Router()
 
 router.post('/:userId', authenticate, controller.followUser)
 router.delete('/:userId', authenticate, controller.unfollowUser)
+router.get(`/:userId/followings`, authenticate, controller.getFollowings)
+router.get(`/:userId/followers`, authenticate, controller.getFollowers)
 router.get(`/:userId`, authenticate, controller.getFollowStatus)
 
 export default router
